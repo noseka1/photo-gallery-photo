@@ -28,6 +28,11 @@ public class PhotoComponent implements ServerComponent {
 		router.get("/photos").handler(this::readAllPhotos);
 	}
 
+	@Override
+	public void injectEventBus(EventBus eventBus) {
+		photosTopic = eventBus.<PhotoItem>publisher(PUBLISH_TOPIC_NAME);
+	}
+
 	private void createPhoto(RoutingContext rc) {
 		PhotoItem addItem;
 		try {
@@ -52,8 +57,4 @@ public class PhotoComponent implements ServerComponent {
 		LOG.info("Returned all {} items", dataStore.getAllItems().size());
 	}
 
-	@Override
-	public void injectEventBus(EventBus eventBus) {
-		photosTopic = eventBus.<PhotoItem>publisher(PUBLISH_TOPIC_NAME);
-	}
 }
