@@ -10,9 +10,9 @@ import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
 
-public class PhotoService implements Service {
+public class PhotoComponent implements Component {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PhotoService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PhotoComponent.class);
 
 	private DataStore<PhotoItem> dataStore = new DataStore<>();
 

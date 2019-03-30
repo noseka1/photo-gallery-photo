@@ -14,7 +14,7 @@ public class Main {
 	public static void main(String[] args) {
 		System.setProperty("vertx.logger-delegate-factory-class-name", SLF4JLogDelegateFactory.class.getName());
 		Vertx vertx = Vertx.vertx();
-		vertx.deployVerticle(new PhotoServer(8080, new PhotoService()));
+		vertx.deployVerticle(new PhotoServer(8080, new PhotoComponent()));
 	}
 }
 
@@ -22,20 +22,20 @@ class PhotoServer extends AbstractVerticle {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhotoServer.class);
 	private final int listenPort;
-	private final Service[] services;
+	private final Component[] components;
 
-	public PhotoServer(int listenPort, Service... services) {
+	public PhotoServer(int listenPort, Component... components) {
 		this.listenPort = listenPort;
-		this.services = services;
+		this.components = components;
 	}
 
 	@Override
 	public void start() {
 		Router router = Router.router(vertx);
 		EventBus eventBus = vertx.eventBus();
-		for (Service service : services) {
-			service.registerRoutes(router);
-			service.injectEventBus(eventBus);
+		for (Component component : components) {
+			component.registerRoutes(router);
+			component.injectEventBus(eventBus);
 		}
 		vertx.createHttpServer().requestHandler(router).rxListen(listenPort).subscribe(this::listenSuccess,
 				this::listenError);
