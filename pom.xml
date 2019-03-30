@@ -16,6 +16,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.redhat.photogallery</groupId>
+            <artifactId>photo-gallery-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>${vertx.version}</version>
@@ -68,7 +73,7 @@
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>com.redhat.photogallery.photo.PhotoService</Main-Class>
+                                        <Main-Class>com.redhat.photogallery.photo.PhotoServer</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

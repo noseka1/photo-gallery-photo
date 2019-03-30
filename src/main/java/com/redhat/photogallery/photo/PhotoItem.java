@@ -1,5 +1,7 @@
 package com.redhat.photogallery.photo;
 
+import com.redhat.photogallery.common.DataStoreItem;
+
 public class PhotoItem extends DataStoreItem {
 
 	private String name;

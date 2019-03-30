@@ -1,5 +1,8 @@
 package com.redhat.photogallery.photo;
 
+import com.redhat.photogallery.common.ServerComponent;
+import com.redhat.photogallery.common.DataStore;
+
 import io.vertx.core.json.Json;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -10,7 +13,7 @@ import io.vertx.reactivex.ext.web.Router;
 import io.vertx.reactivex.ext.web.RoutingContext;
 import io.vertx.reactivex.ext.web.handler.BodyHandler;
 
-public class PhotoComponent implements Component {
+public class PhotoComponent implements ServerComponent {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhotoComponent.class);
 
@@ -37,7 +40,7 @@ public class PhotoComponent implements Component {
 		HttpServerResponse response = rc.response();
 		response.putHeader("content-type", "application/json");
 		response.end(Json.encodePrettily(item.getId()));
-		LOG.info("Inserted item {} into data store", item);
+		LOG.info("Inserted {} into data store", item);
 		photosTopic.write(item);
 		LOG.info("Published item {} on topic {}", item, photosTopic.address());
 	}
