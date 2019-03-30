@@ -2,7 +2,7 @@
 
 Management of photos
 
-This component requires `photo-gallery-common` library.
+This component requires the `photo-gallery-common` library. Make sure you build that library first.
 
  You can build this project using:
 
@@ -18,7 +18,7 @@ java -jar ./target/photo-gallery-photo-1.0-SNAPSHOT-fat.jar
 
 After the service starts up you can test it using curl.
 
-You can create some photos:
+To create some photos:
 
 ```
 curl -v -X POST --data '{"name":"Odie","category":"animals"}' localhost:8080/photos
@@ -26,7 +26,7 @@ curl -v -X POST --data '{"name":"Garfield","category":"animals"}' localhost:8080
 curl -v -X POST --data '{"name":"Empire state building","category":"buildings"}' localhost:8080/photos
 ```
 
-You can retrieve all created photos:
+To retrieve all created photos:
 
 ```
 curl -v localhost:8080/photos
