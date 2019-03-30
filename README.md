@@ -4,7 +4,7 @@ Management of photos
 
 This component requires the `photo-gallery-common` library. Make sure you build that library first.
 
- You can build this project using:
+You can build this project using:
 
 ```
 mvn clean install package
