@@ -22,4 +22,9 @@ public class PhotoItem extends DataStoreItem {
 	public void setCategory(String category) {
 		this.category = category;
 	}
+
+	@Override
+	public String toString() {
+		return "PhotoItem [name=" + name + ", category=" + category + ", id=" + id + "]";
+	}
 }

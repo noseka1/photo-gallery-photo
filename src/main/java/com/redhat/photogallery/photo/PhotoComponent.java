@@ -5,6 +5,7 @@ import com.redhat.photogallery.common.Constants;
 import com.redhat.photogallery.common.DataStore;
 
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.reactivex.core.eventbus.EventBus;
@@ -20,7 +21,7 @@ public class PhotoComponent implements ServerComponent {
 
 	private DataStore<PhotoItem> dataStore = new DataStore<>();
 
-	MessageProducer<PhotoItem> topic;
+	MessageProducer<JsonObject> topic;
 
 	@Override
 	public void registerRoutes(Router router) {
@@ -30,7 +31,7 @@ public class PhotoComponent implements ServerComponent {
 
 	@Override
 	public void injectEventBus(EventBus eventBus) {
-		topic = eventBus.<PhotoItem>publisher(Constants.PHOTOS_TOPIC_NAME);
+		topic = eventBus.<JsonObject>publisher(Constants.PHOTOS_TOPIC_NAME);
 	}
 
 	private void createPhoto(RoutingContext rc) {
@@ -46,7 +47,12 @@ public class PhotoComponent implements ServerComponent {
 		response.putHeader("content-type", "application/json");
 		response.end(Json.encodePrettily(item.getId()));
 		LOG.info("Inserted {} into data store", item);
-		topic.write(item);
+		try {
+			topic.write(JsonObject.mapFrom(item));
+		} catch (Exception e) {
+			LOG.error("Failed publish item {}", addItem, e);
+			throw e;
+		}
 		LOG.info("Published item {} on topic {}", item, topic.address());
 	}
 
