@@ -1,8 +1,9 @@
 package com.redhat.photogallery.photo;
 
 import com.redhat.photogallery.common.ServerComponent;
+import com.redhat.photogallery.common.data.DataStore;
+import com.redhat.photogallery.common.data.PhotoItem;
 import com.redhat.photogallery.common.Constants;
-import com.redhat.photogallery.common.DataStore;
 
 import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
