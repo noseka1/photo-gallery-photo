@@ -1,6 +1,6 @@
 # photo-gallery-photo
 
-Management of photos
+Photo component
 
 This component requires the `photo-gallery-common` library. Make sure you build that library first.
 
