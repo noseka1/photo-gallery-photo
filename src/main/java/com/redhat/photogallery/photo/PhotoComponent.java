@@ -35,25 +35,26 @@ public class PhotoComponent implements ServerComponent {
 	}
 
 	private void createPhoto(RoutingContext rc) {
-		PhotoItem addItem;
+		PhotoItem item;
 		try {
-			addItem = rc.getBodyAsJson().mapTo(PhotoItem.class);
+			item = rc.getBodyAsJson().mapTo(PhotoItem.class);
 		} catch (Exception e) {
 			LOG.error("Failed parse item {}", rc.getBodyAsString(), e);
-			throw e;
+			rc.response().setStatusCode(400).end();
+			return;
 		}
-		PhotoItem item = dataStore.insertItem(addItem);
+
+		item.setId(dataStore.generateId());
+
+		dataStore.putItem(item);
+		LOG.info("Added {} into the data store", item);
+
+		topic.write(JsonObject.mapFrom(item));
+		LOG.info("Published {} on topic {}", item, topic.address());
+
 		HttpServerResponse response = rc.response();
 		response.putHeader("content-type", "application/json");
 		response.end(Json.encodePrettily(item.getId()));
-		LOG.info("Inserted {} into data store", item);
-		try {
-			topic.write(JsonObject.mapFrom(item));
-		} catch (Exception e) {
-			LOG.error("Failed publish item {}", addItem, e);
-			throw e;
-		}
-		LOG.info("Published item {} on topic {}", item, topic.address());
 	}
 
 	private void readAllPhotos(RoutingContext rc) {
