@@ -18,51 +18,51 @@ import io.vertx.reactivex.ext.web.handler.BodyHandler;
 
 public class PhotoComponent implements ServerComponent {
 
-	private static final Logger LOG = LoggerFactory.getLogger(PhotoComponent.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PhotoComponent.class);
 
-	private DataStore<PhotoItem> dataStore = new DataStore<>();
+    private DataStore<PhotoItem> dataStore = new DataStore<>();
 
-	MessageProducer<JsonObject> topic;
+    MessageProducer<JsonObject> topic;
 
-	@Override
-	public void registerRoutes(Router router) {
-		router.post("/photos").handler(BodyHandler.create()).handler(this::createPhoto);
-		router.get("/photos").handler(this::readAllPhotos);
-	}
+    @Override
+    public void registerRoutes(Router router) {
+        router.post("/photos").handler(BodyHandler.create()).handler(this::createPhoto);
+        router.get("/photos").handler(this::readAllPhotos);
+    }
 
-	@Override
-	public void injectEventBus(EventBus eventBus) {
-		topic = eventBus.<JsonObject>publisher(Constants.PHOTOS_TOPIC_NAME);
-	}
+    @Override
+    public void injectEventBus(EventBus eventBus) {
+        topic = eventBus.<JsonObject>publisher(Constants.PHOTOS_TOPIC_NAME);
+    }
 
-	private void createPhoto(RoutingContext rc) {
-		PhotoItem item;
-		try {
-			item = rc.getBodyAsJson().mapTo(PhotoItem.class);
-		} catch (Exception e) {
-			LOG.error("Failed parse item {}", rc.getBodyAsString(), e);
-			rc.response().setStatusCode(400).end();
-			return;
-		}
+    private void createPhoto(RoutingContext rc) {
+        PhotoItem item;
+        try {
+            item = rc.getBodyAsJson().mapTo(PhotoItem.class);
+        } catch (Exception e) {
+            LOG.error("Failed parse item {}", rc.getBodyAsString(), e);
+            rc.response().setStatusCode(400).end();
+            return;
+        }
 
-		item.setId(dataStore.generateId());
+        item.setId(dataStore.generateId());
 
-		dataStore.putItem(item);
-		LOG.info("Added {} into the data store", item);
+        dataStore.putItem(item);
+        LOG.info("Added {} into the data store", item);
 
-		topic.write(JsonObject.mapFrom(item));
-		LOG.info("Published {} on topic {}", item, topic.address());
+        topic.write(JsonObject.mapFrom(item));
+        LOG.info("Published {} on topic {}", item, topic.address());
 
-		HttpServerResponse response = rc.response();
-		response.putHeader("content-type", "application/json");
-		response.end(Json.encodePrettily(item.getId()));
-	}
+        HttpServerResponse response = rc.response();
+        response.putHeader("content-type", "application/json");
+        response.end(Json.encodePrettily(item.getId()));
+    }
 
-	private void readAllPhotos(RoutingContext rc) {
-		HttpServerResponse response = rc.response();
-		response.putHeader("content-type", "application/json");
-		response.end(Json.encodePrettily(dataStore.getAllItems()));
-		LOG.info("Returned all {} items", dataStore.getAllItems().size());
-	}
+    private void readAllPhotos(RoutingContext rc) {
+        HttpServerResponse response = rc.response();
+        response.putHeader("content-type", "application/json");
+        response.end(Json.encodePrettily(dataStore.getAllItems()));
+        LOG.info("Returned all {} items", dataStore.getAllItems().size());
+    }
 
 }
