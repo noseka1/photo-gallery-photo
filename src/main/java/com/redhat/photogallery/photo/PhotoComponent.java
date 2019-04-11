@@ -1,22 +1,30 @@
 package com.redhat.photogallery.photo;
 
-import com.redhat.photogallery.common.ServerComponent;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.redhat.photogallery.common.Constants;
 import com.redhat.photogallery.common.data.DataStore;
 import com.redhat.photogallery.common.data.PhotoItem;
-import com.redhat.photogallery.common.Constants;
 
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.reactivex.core.eventbus.EventBus;
 import io.vertx.reactivex.core.eventbus.MessageProducer;
-import io.vertx.reactivex.core.http.HttpServerResponse;
-import io.vertx.reactivex.ext.web.Router;
-import io.vertx.reactivex.ext.web.RoutingContext;
-import io.vertx.reactivex.ext.web.handler.BodyHandler;
 
-public class PhotoComponent implements ServerComponent {
+@Path("/photos")
+public class PhotoComponent {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhotoComponent.class);
 
@@ -24,27 +32,15 @@ public class PhotoComponent implements ServerComponent {
 
     MessageProducer<JsonObject> topic;
 
-    @Override
-    public void registerRoutes(Router router) {
-        router.post("/photos").handler(BodyHandler.create()).handler(this::createPhoto);
-        router.get("/photos").handler(this::readAllPhotos);
-    }
-
-    @Override
+    @Inject
     public void injectEventBus(EventBus eventBus) {
         topic = eventBus.<JsonObject>publisher(Constants.PHOTOS_TOPIC_NAME);
     }
 
-    private void createPhoto(RoutingContext rc) {
-        PhotoItem item;
-        try {
-            item = rc.getBodyAsJson().mapTo(PhotoItem.class);
-        } catch (Exception e) {
-            LOG.error("Failed parse item {}", rc.getBodyAsString(), e);
-            rc.response().setStatusCode(400).end();
-            return;
-        }
-
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String createPhoto(PhotoItem item) {
         item.setId(dataStore.generateId());
 
         dataStore.putItem(item);
@@ -53,16 +49,15 @@ public class PhotoComponent implements ServerComponent {
         topic.write(JsonObject.mapFrom(item));
         LOG.info("Published {} on topic {}", item, topic.address());
 
-        HttpServerResponse response = rc.response();
-        response.putHeader("content-type", "application/json");
-        response.end(Json.encodePrettily(item.getId()));
+        return item.getId();
     }
 
-    private void readAllPhotos(RoutingContext rc) {
-        HttpServerResponse response = rc.response();
-        response.putHeader("content-type", "application/json");
-        response.end(Json.encodePrettily(dataStore.getAllItems()));
-        LOG.info("Returned all {} items", dataStore.getAllItems().size());
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response readAllPhotos() {
+        List<PhotoItem> items = dataStore.getAllItems();
+        LOG.info("Returned all {} items", items.size());
+        return Response.ok(new GenericEntity<List<PhotoItem>>(items){}).build();
     }
 
 }
