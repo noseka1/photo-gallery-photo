@@ -2,7 +2,10 @@ package com.redhat.photogallery.photo;
 
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -28,7 +31,10 @@ public class PhotoResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhotoResource.class);
 
-    MessageProducer<JsonObject> topic;
+    private MessageProducer<JsonObject> topic;
+
+    @Inject
+    EntityManager entityManager;
 
     @Inject
     public void injectEventBus(EventBus eventBus) {
@@ -54,7 +60,8 @@ public class PhotoResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response readAllPhotos() {
-        List<PhotoItem> items = PhotoItem.listAll();
+        Query query = entityManager.createQuery("FROM PhotoItem");
+        List<PhotoItem> items = query.getResultList();
         LOG.info("Returned all {} items", items.size());
         return Response.ok(new GenericEntity<List<PhotoItem>>(items){}).build();
     }
