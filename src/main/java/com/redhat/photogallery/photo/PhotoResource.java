@@ -61,6 +61,7 @@ public class PhotoResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response readAllPhotos() {
         Query query = entityManager.createQuery("FROM PhotoItem");
+        @SuppressWarnings("unchecked")
         List<PhotoItem> items = query.getResultList();
         LOG.info("Returned all {} items", items.size());
         return Response.ok(new GenericEntity<List<PhotoItem>>(items){}).build();
