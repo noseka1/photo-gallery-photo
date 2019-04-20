@@ -1,6 +1,6 @@
 # photo-gallery-photo
 
-Photo component
+## Build
 
 This component requires the `photo-gallery-common` library. Make sure you build that library first.
 
@@ -9,6 +9,18 @@ You can build this project using:
 ```
 mvn clean install package
 ```
+
+## Database
+
+This component requires access to a PostgreSQL database. You can create it using:
+
+```
+psql -c 'CREATE DATABASE photodb'
+psql -c "CREATE USER photouser WITH ENCRYPTED PASSWORD 'password'"
+psql -c 'GRANT ALL PRIVILEGES ON DATABASE photodb TO photouser'
+```
+
+## Run
 
 You can run this component as a standalone service using:
 
