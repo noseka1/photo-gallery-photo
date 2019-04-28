@@ -26,9 +26,9 @@ import io.vertx.reactivex.core.eventbus.EventBus;
 import io.vertx.reactivex.core.eventbus.MessageProducer;
 
 @Path("/photos")
-public class PhotoResource {
+public class PhotoService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PhotoResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PhotoService.class);
 
     private MessageProducer<JsonObject> topic;
 
