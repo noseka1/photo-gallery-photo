@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.photogallery.common.Constants;
-import com.redhat.photogallery.common.data.PhotoMessage;
+import com.redhat.photogallery.common.data.PhotoCreatedMessage;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.reactivex.core.eventbus.EventBus;
@@ -49,9 +49,9 @@ public class PhotoResource {
         item.persist();
         LOG.info("Added {} into the data store", item);
 
-        PhotoMessage photoMessage = createPhotoMessage(item);
-        topic.write(JsonObject.mapFrom(photoMessage));
-        LOG.info("Published {} on topic {}", photoMessage, topic.address());
+        PhotoCreatedMessage message = createPhotoCreatedMessage(item);
+        topic.write(JsonObject.mapFrom(message));
+        LOG.info("Published {} on topic {}", message, topic.address());
 
         return item.id;
     }
@@ -66,8 +66,8 @@ public class PhotoResource {
         return Response.ok(new GenericEntity<List<PhotoItem>>(items){}).build();
     }
 
-    private PhotoMessage createPhotoMessage(PhotoItem item) {
-        PhotoMessage msg = new PhotoMessage();
+    private PhotoCreatedMessage createPhotoCreatedMessage(PhotoItem item) {
+        PhotoCreatedMessage msg = new PhotoCreatedMessage();
         msg.setId(item.id);
         msg.setName(item.name);
         msg.setCategory(item.category);
