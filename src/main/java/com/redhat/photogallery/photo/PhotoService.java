@@ -3,8 +3,6 @@ package com.redhat.photogallery.photo;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,9 +31,6 @@ public class PhotoService {
     private MessageProducer<JsonObject> topic;
 
     @Inject
-    EntityManager entityManager;
-
-    @Inject
     public void injectEventBus(EventBus eventBus) {
         topic = eventBus.<JsonObject>publisher(Constants.PHOTOS_TOPIC_NAME);
     }
@@ -59,9 +54,7 @@ public class PhotoService {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response readAllPhotos() {
-        Query query = entityManager.createQuery("FROM PhotoItem");
-        @SuppressWarnings("unchecked")
-        List<PhotoItem> items = query.getResultList();
+        List<PhotoItem> items = PhotoItem.listAll();
         LOG.info("Returned all {} items", items.size());
         return Response.ok(new GenericEntity<List<PhotoItem>>(items){}).build();
     }
